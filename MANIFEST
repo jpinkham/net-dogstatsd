@@ -4,6 +4,7 @@ Changes
 ignore.txt
 lib/Net/Dogstatsd.pm
 LICENSE
+Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 META.json
@@ -19,3 +20,4 @@ xt/perlcritic.t
 xt/pod-coverage.t
 xt/pod.t
 xt/unix_eol.t
+Makefile.PL
