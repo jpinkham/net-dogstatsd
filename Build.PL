@@ -56,7 +56,7 @@ my $builder = $class->new(
 		'perl'                 => 5.006,
 	},
 	add_to_cleanup       => [ 'Net-Dogstatsd-*' ],
-	create_makefile_pl   => 'passthrough',
+	create_makefile_pl   => 'traditional',
 	recursive_test_files => 1,
 	configure_requires   =>
 	{
