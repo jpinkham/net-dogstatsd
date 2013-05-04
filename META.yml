@@ -1,0 +1,37 @@
+---
+abstract: "Perl client to Datadog's dogstatsd metrics collector."
+author:
+  - 'Jennifer Pinkham <jpinkham@cpan.org>'
+build_requires:
+  Scalar::Util: 0
+  Storable: 0
+  Test::Exception: 0
+  Test::More: 0.94
+  Test::NoWarnings: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-Dogstatsd
+provides:
+  Net::Dogstatsd:
+    file: lib/Net/Dogstatsd.pm
+    version: v0.9.0
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Data::Validate::Type: 0
+  LWP::UserAgent: 0
+  Net::Telnet: 0
+  Try::Tiny: 0
+  perl: 5.006
+resources:
+  bugtracker: https://github.com/jpinkham/net-dogstatsd/issues
+  homepage: https://metacpan.org/release/Net-Dogstatsd
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
+  repository: https://github.com/jpinkham/net-dogstatsd
+version: v0.9.0
