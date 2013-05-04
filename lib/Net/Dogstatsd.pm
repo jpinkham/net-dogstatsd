@@ -87,53 +87,84 @@ sub new
 }
 
 
+=head2 verbose()
+
+Get or set the 'verbose' property.
+
+	my $verbose = $dogstatsd->verbose();
+	$dogstatsd->verbose( 1 );
+
+=cut
+
+sub verbose
+{
+	my ( $self, $value ) = @_;
+	
+	if ( defined $value && $value =~ /^[01]$/ )
+	{
+		$self->{'verbose'} = $value;
+	}
+	else
+	{
+		return $self->{'verbose'};
+	}
+	
+	return;
+}
+
+
+=head2 get_socket()
+
+Create a new socket, if one does not already exist.
+
+	my $socket = $dogstatsd->get_socket();
+
+=cut
+
+sub get_socket
+{
+	my ( $self ) = @_;
+	my $verbose = $self->verbose();
+	
+	if ( !defined $self->{'socket'} )
+	{
+		try
+		{
+			$self->{'socket'} = IO::Socket::INET->new(
+				PeerAddr => $self->{'host'},
+				PeerPort => $self->{'port'},
+				Proto    => 'udp'
+				) 
+			|| die "Could not open UDP connection to" . $self->{'host'} . ":" . $self->{'port'};
+			
+		}
+		catch
+		{
+			croak( "Could not open connection to metrics server. Error: >$_<" );
+		};
+	}
+	
+	return $self->{'socket'};
+}
+
 
 
 =head1 RUNNING TESTS
 
-By default, only basic tests that do not require a connection to Adobe
-Dogstatsd's platform are run in t/.
+By default, only basic tests that do not require a connection to Datadog's
+platform are run in t/.
 
 To run the developer tests, you will need to do the following:
 
 =over 4
 
-=item *
+=item * Sign up to become a Datadog customer ( if you are not already), at
+L<https://app.datadoghq.com/signup>. Free trial accounts are available.
 
-Request access to Adobe web services from your Adobe Online Marketing Suite administrator.
-
-=item *
-
-In Dogstatsd's interface, you will need to log in as an admin, then go
-to the "Admin" tab, "Admin Console > Company > Web Services". There you can find
-your "shared secret" for your username.
-
-=item *
-
-Your report suite IDs can be found in Dogstatsd's interface. Visit
-"Admin > Admin Console > Report Suites".
+=item * Install and configure Datadog agent software (requires python 2.6)
+L<https://app.datadoghq.com/account/settings#agent>
 
 =back
-
-You can now create a file named DogstatsdConfig.pm in your own directory, with
-the following content:
-
-	package DogstatsdConfig;
-
-	sub new
-	{
-		return
-		{
-			username                => 'username',
-			shared_secret           => 'shared_secret',
-			verbose                 => 0, # Enable this for debugging output
-		};
-	}
-
-	1;
-
-You will then be able to run all the tests included in this distribution, after
-adding the path to DogstatsdConfig.pm to your library paths.
 
 
 =head1 AUTHOR
@@ -143,8 +174,7 @@ Jennifer Pinkham, C<< <jpinkham at cpan.org> >>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-Net-Dogstatsd at rt.cpan.org>,
-or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Dogstatsd>.
+Please report any bugs or feature requests to the GitHub Issue Tracker at L<https://github.com/jpinkham/net-dogstatsd/issues>.
 I will be notified, and then you'll automatically be notified of progress on
 your bug as I make changes.
 
@@ -160,9 +190,9 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker
+=item * Bugs: GitHub Issue Tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Dogstatsd>
+L<https://github.com/jpinkham/net-dogstatsd/issues>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -172,21 +202,21 @@ L<http://annocpan.org/dist/Net-Dogstatsd>
 
 L<http://cpanratings.perl.org/d/Net-Dogstatsd>
 
-=item * Search CPAN
+=item * MetaCPAN
 
-L<http://search.cpan.org/dist/Net-Dogstatsd/>
+L<https://metacpan.org/release/Net-Dogstatsd>
 
 =back
 
 
 =head1 ACKNOWLEDGEMENTS
 
-Special thanks for technical help from fellow ThinkGeek CPAN author Guillaume Aubert L<http://search.cpan.org/~aubertg/>
-
+Thanks to ThinkGeek (<http://www.thinkgeek.com/>) and its corporate overlords at
+Geeknet (<http://www.geek.net/>), for footing the bill while I write code for them!
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2012 Jennifer Pinkham.
+Copyright 2013 Jennifer Pinkham.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the Artistic License.
