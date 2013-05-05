@@ -9,13 +9,13 @@ use Test::Exception;
 use Net::Dogstatsd;
 
 
-# Create an object to communicate with Dogstatsd - no parameters.
+# Create an object to communicate with Dogstatsd, using default server/port settings.
 my $dogstatsd = Net::Dogstatsd->new();
 
-isa_ok(
-	$dogstatsd, 'Net::Dogstatsd',
-	'Return value of Net::Dogstatsd->new()',
-) || diag( explain( $dogstatsd ) );
+ok(
+	defined( $dogstatsd ),
+	'Net::Dogstatsd instance defined',
+);
 
 
 # Set verbosity with invalid value

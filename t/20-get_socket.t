@@ -8,14 +8,13 @@ use Test::More tests => 2;
 use Net::Dogstatsd;
 
 
-# Create an object to communicate with Dogstatsd - no parameters.
+# Create an object to communicate with Dogstatsd, using default server/port settings.
 my $dogstatsd = Net::Dogstatsd->new();
 
-isa_ok(
-	$dogstatsd, 'Net::Dogstatsd',
-	'Return value of Net::Dogstatsd->new()',
-) || diag( explain( $dogstatsd ) );
-
+ok(
+	defined( $dogstatsd ),
+	'Net::Dogstatsd instance defined',
+);
 
 my $ddog_socket = $dogstatsd->get_socket();
 
