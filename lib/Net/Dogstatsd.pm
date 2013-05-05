@@ -259,9 +259,9 @@ sub _error_checks
 	# Check that optional 'sample_rate' argument is valid ( 1, or a float between 0 and 1 )
 	if ( defined $args{'sample_rate'} )
 	{
-		if ( !Data::Validate::Type::is_number( $args{'sample_rate'} , positive => 1 ) || $args{'sample_rate'} > 1 )
+		if ( !Data::Validate::Type::is_number( $args{'sample_rate'} , strictly_positive => 1 ) || $args{'sample_rate'} > 1 )
 		{
-			croak "invalid sample rate >" . $args{'sample_rate'} . "<. Must be 1, or a float between 0 and 1.";
+			croak "ERROR - Invalid sample rate >" . $args{'sample_rate'} . "<. Must be 1, or a float between 0 and 1.";
 		}
 	}
 	
