@@ -26,14 +26,14 @@ our $VERSION = '0.9.0';
 
 =head1 SYNOPSIS
 
-This module allows you to interact with dogstatsd, a local daemon installed by
-Datadog agent package. dogstatsd sends custom metrics to the Datadog service.
+This module allows you to send multiple types of metrics to the Datadog service
+via dogstatsd, a local daemon installed by Datadog agent package.
 
 	use Net::Dogstatsd;
 
 	# Create object.
 	my $dogstatsd = Net::Dogstatsd->new();
-
+	
 =cut
 
 =head1 MAIN
@@ -147,6 +147,198 @@ sub get_socket
 	return $self->{'socket'};
 }
 
+
+
+=head2 increment()
+
+Increment a counter metric. Include optional 'value' argument to increment by >1.
+Include optional arrayref of tags/tag-values.
+
+	$metric->increment(
+		name  => $metric_name,
+		value => $increment_value, #optional; default = 1
+	);
+	
+	$metric->increment(
+		name  => $metric_name,
+		value => $increment_value, #optional; default = 1
+		tags  => [ tag1, tag2:value, tag3 ],
+	);
+
+=cut
+
+sub increment
+{
+	my ( $self, %args ) = @_;
+	my $verbose = $self->verbose();
+	
+	# Check for mandatory parameters
+	foreach my $arg ( qw( name  ) )
+	{
+		croak "Argument '$arg' is a required argument"
+			if !defined( $args{$arg} ) || ( $args{$arg} eq '' );
+	}
+	
+	# Check that value, if provided, is a positive integer
+	if ( defined( $args{'value' } ) )
+	{
+		croak "Value >$args{'value'}< is not a positive integer, which is required for increment()"
+			if ( $args{'value'} !~ /^\d+$/ || $args{'value'} <= 0 );
+	}
+	
+	# Error checks common to all metric types
+	$self->_error_checks( %args );
+	
+	$self->_send_metric(
+		type        => 'counter',
+		name        => $args{'name'},
+		value       => 
+			( defined $args{'value'} && $args{'value'} ne '' )
+				? $args{'value'}
+				: 1,
+		tags        => 
+			defined $args{'tags'}
+				? $args{'tags'}
+				: [],
+		sample_rate => 
+			defined $args{'sample_rate'}
+				? $args{'sample_rate'}
+				: 1,
+	);
+	
+	return;
+}
+
+
+=head1 INTERNAL FUNCTIONS
+
+=head2 _error_checks()
+
+	$self->_error_checks( %args );
+
+Common error checking for all metric types.
+
+=cut
+
+sub _error_checks
+{
+	my ( $self, %args ) = @_;
+	my $verbose = $self->verbose();
+	
+	# Metric name starts with a letter
+	if ( $args{'name'} !~ /^[a-zA-Z]/ )
+	{
+		croak( "ERROR - Invalid metric name >" . $args{'name'} . "<. Names must start with a letter, a-z. Not sending." );
+	}
+	
+	# Tags, if exist...
+	if ( defined( $args{'tags'} ) && scalar( $args{'tags'} ) != 0 )
+	{
+		if ( !Data::Validate::Type::is_arrayref( $args{'tags'} ) )
+		{
+			croak "tag list is invalid. Must be an arrayref.";
+		}
+		
+		foreach my $tag ( @{ $args{'tags'} } )
+		{
+			# Must start with a letter
+			croak( "ERROR - Invalid tag >" . $tag . "< on metric >" . $args{'name'} . "<. Tags must start with a letter, a-z. Not sending." )
+				if ( $tag !~ /^[a-zA-Z]/ );
+			
+			# Must be 200 characters max
+			croak( "ERROR - Invalid tag >" . $tag . "< on metric >" . $args{'name'} . "<. Tags must be 200 chars or less. Not sending." )
+				if ( length( $tag ) > 200 );
+			
+			# NOTE: This check isn't required by Datadog, they will allow this through.
+			# However, this tag will not behave as expected in the graphs, if we were to allow it.
+			croak( "ERROR - Invalid tag >" . $tag . "< on metric >" . $args{'name'} . "<. Tags should only contain a single colon (:). Not sending." )
+				if ( $tag =~ /^\S+:\S+:/ );
+		}
+	}
+	
+	# Check that optional 'sample_rate' argument is valid ( 1, or a float between 0 and 1 )
+	if ( defined $args{'sample_rate'} )
+	{
+		if ( !Data::Validate::Type::is_number( $args{'sample_rate'} , positive => 1 ) || $args{'sample_rate'} > 1 )
+		{
+			croak "invalid sample rate >" . $args{'sample_rate'} . "<. Must be 1, or a float between 0 and 1.";
+		}
+	}
+	
+	return;
+}
+
+
+=head2 _send_metric()
+
+Send metric to stats server.
+
+=cut
+
+sub _send_metric
+{
+	my ( $self, %args ) = @_;
+	my $verbose = $self->verbose();
+	
+	# Check for mandatory parameters
+	foreach my $arg ( qw( name type value ) )
+	{
+		croak "Argument '$arg' is a required argument"
+			if !defined( $args{$arg} ) || ( $args{$arg} eq '' );
+	}
+	
+	my $original_name = $args{'name'};
+	# Metric name should only contain alphanumeric, "_", ".". Convert anything else to underscore and warn about substitution
+	# NOTE: Datadog will do this for you anyway, but won't warn you what the actual metric name will become.
+	$args{'name'} =~ s/[^a-zA-Z0-9_\.]/_/;
+	carp( "WARNING: converted metric name from >$original_name< to >", $args{'name'}, "<. Names should only contain: a-z, 0-9, underscores, and dots/periods." )
+		if $args{'name'} ne $original_name;
+	
+	# Default sample rate = 1
+	$args{'sample_rate'} //= 1;
+	
+	my $socket = $self->get_socket();
+	return unless defined $socket;
+	
+	# Datagram format. More info at http://docs.datadoghq.com/guides/dogstatsd/
+	# dashboard.metricname:value|type|@sample_rate|#tag1:value,tag2
+	my $metric_string = $args{'name'} . ":" . $args{'value'} . '|' . $METRIC_TYPES->{ $args{'type'} } . '|@' . $args{'sample_rate'} ;
+	
+	if ( defined $args{'tags'} && scalar ( @{ $args{'tags'} } ) != 0 )
+	{
+		foreach my $tag ( @{ $args{'tags'} } )
+		{
+			my $original_tag = $tag;
+
+			$tag =~ s/\s+$//; # Strip trailing whitespace
+			# Tags should only contain alphanumeric, "_", "-",".", "/", ":". Convert anything else to underscore and warn about substitution
+			$tag =~ s/[^a-zA-Z0-9_\-\.\/:]/_/g;
+			$tag =~ s/\s+/_/g; # Replace remaining whitespace with underscore
+			carp( "WARNING: converted tag from >$original_tag< to >", $tag, "<. Tags should only contain: a-z, 0-9, underscores, dashes, dots/periods, forward slashes, colons." )
+				if $tag ne $original_tag;
+		}
+		$metric_string .= '|#' . join( ',', @{ $args{'tags'} } );
+	}
+	
+	# Force to all lower case because Datadog has case sensitive tags and metric
+	# names. We don't want to end up with multiple case variations of the same
+	# metric name/tag
+	$metric_string = lc( $metric_string );
+	
+	warn( "\nbuilt metric string >$metric_string<" ) if $verbose;
+	
+	# Use of rand() is how the Ruby and Python clients implement sampling, so we will too.
+	if ( $args{'sample_rate'} == 1 || ( rand() < $args{'sample_rate'} ) )
+	{
+		my $response = IO::Socket::send( $socket, $metric_string, 0 );
+		unless (defined $response) 
+		{
+			carp( "error sending metric [string >$metric_string<]: $!" );
+		}
+	}
+	
+	return;
+}
 
 
 =head1 RUNNING TESTS
