@@ -236,7 +236,7 @@ sub _error_checks
 	{
 		if ( !Data::Validate::Type::is_arrayref( $args{'tags'} ) )
 		{
-			croak "tag list is invalid. Must be an arrayref.";
+			croak "ERROR - Tag list is invalid. Must be an arrayref.";
 		}
 		
 		foreach my $tag ( @{ $args{'tags'} } )
@@ -245,7 +245,7 @@ sub _error_checks
 			croak( "ERROR - Invalid tag >" . $tag . "< on metric >" . $args{'name'} . "<. Tags must start with a letter, a-z. Not sending." )
 				if ( $tag !~ /^[a-zA-Z]/ );
 			
-			# Must be 200 characters max
+			# Must be < 200 characters [ discovered this limitation while testing. Datadog stated it should truncate, but I received various errors ]
 			croak( "ERROR - Invalid tag >" . $tag . "< on metric >" . $args{'name'} . "<. Tags must be 200 chars or less. Not sending." )
 				if ( length( $tag ) > 200 );
 			
