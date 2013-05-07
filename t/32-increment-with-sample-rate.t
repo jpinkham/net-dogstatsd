@@ -5,6 +5,8 @@ use warnings;
 
 use Test::More tests => 6;
 use Test::Exception;
+use Test::FailWarnings -allow_deps => 1;
+
 use Net::Dogstatsd;
 
 
