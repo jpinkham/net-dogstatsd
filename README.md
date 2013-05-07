@@ -1,18 +1,65 @@
 Net-Dogstatsd
 
+DESCRIPTION
 This module provides a simple Perl client to 'dogstatsd', a daemon provided with
-the Datadog agent software. Its purpose is to aggregate sending of custom
-metrics to the Datadog service.  dogstatsd is very similar to statsd, but
+the Datadog agent software. The purpose of dogstatsd is to aggregate the sending
+of metrics to the Datadog service.  dogstatsd is very similar to statsd, but
 supports additional metric types, as well as adding informational tags to
 metrics (which makes for easy "slicing and dicing" of your metrics within the
 Datadog graphs/dashboards.
 
-Datadog (http://http://www.datadoghq.com/) is a service that will 
-"Capture metrics and events, then graph, filter, and search to see what's 
-happening and how systems interact. Datadog is a service for IT,
-Operations and Development teams who write and run applications at scale, and
-want to turn the massive amounts of data produced by their apps, tools and
-services into actionable insight."
+Datadog (http://www.datadoghq.com/) is a service that will "Capture metrics and
+events, then graph, filter, and search to see what's happening and how systems
+interact. Datadog is a service for IT, Operations and Development teams who write
+and run applications at scale, and want to turn the massive amounts of data
+produced by their apps, tools and services into actionable insight."
+
+Available metric types:
+
+* counter
+Counters can be incremented and decremented by any amount, via the increment()
+and decrement() methods.
+
+* gauge
+Gauges are used for 
+Submit them with the gauge() method.
+
+* histogram
+Histograms are used for
+Submit them with the histogram() method.
+
+* timer
+Timers are used for measuring the duration of an activity. They are a special
+type of histogram.
+Submit them with the timer() method.
+
+* set
+Sets are special versions of a counter, for tracking unique items in a group.
+Submit them with the sets() method.
+
+
+NOTES
+Choose metric names wisely. The first portion of the metric name will determine
+the (auto-created) dashboard where the metric will appear. You can end up with
+a large amount of auto-created dashboards if you use many different names in
+the first portion of the metric name.
+Examples:
+Metric Name                           Dashboard
+------------------------------------------------------------------------------
+testmetric.requests                   testmetric
+traffic.pages_per_second              traffic
+testmetric.cs.customer_contacts       testmetric
+
+	
+All metric names, values, and tags are converted to lower case before
+sending. This was done to prevent multiple instances of the same metric/tag name
+but with varying case. 
+
+Also, whitespace (and other special characters) in tags and metric names are
+automatically replaced with "_". Warnings are printed whenever characters are
+replaced in the metric name. Datadog will make similar changes for you
+automatically, but this happens silently and, as a result, can make it harder to
+find the resulting metrics within your dashboards.
 
 INSTALLATION
 
