@@ -170,7 +170,63 @@ Include optional arrayref of tags/tag-values.
 sub increment
 {
 	my ( $self, %args ) = @_;
-	my $verbose = $self->verbose();
+	
+	$self->_counter( action => 'increment', %args );
+	return;
+}
+
+
+=head2 decrement()
+
+Decrement a counter metric. Include optional 'value' argument to decrement by >1.
+Include optional arrayref of tags/tag-values.
+
+	$metric->decrement(
+		name  => $metric_name,
+		value => $decrement_value, #optional; default = 1
+	);
+	
+	$metric->decrement(
+		name  => $metric_name,
+		value => $decrement_value, #optional; default = 1
+		tags  => [ tag1, tag2:value, tag3 ],
+	);
+
+=cut
+
+sub decrement
+{
+	my ( $self, %args ) = @_;
+	
+	$self->_counter( action => 'decrement', %args );
+	return;
+}
+
+
+=head1 INTERNAL FUNCTIONS
+
+=head2 _counter
+
+	$self->_counter(
+		action => [ increment | decrement ],
+		%args
+	);
+
+=cut
+
+sub _counter
+{
+	my ( $self, %args ) = @_;
+	
+	my $action = delete( $args{'action'} );
+	my $multipliers = {
+		'increment' => 1,
+		'decrement' => -1,
+	};
+	
+	croak "Error - invalid action >$action<" unless exists( $multipliers->{ $action } );
+		
+	my $multiplier = $multipliers->{ $action };
 	
 	# Check for mandatory parameters
 	foreach my $arg ( qw( name  ) )
@@ -182,20 +238,21 @@ sub increment
 	# Check that value, if provided, is a positive integer
 	if ( defined( $args{'value' } ) )
 	{
-		croak "Value >$args{'value'}< is not a positive integer, which is required for increment()"
+		croak "Value >$args{'value'}< is not a positive integer, which is required for " . $action . '()'
 			if ( $args{'value'} !~ /^\d+$/ || $args{'value'} <= 0 );
 	}
 	
 	# Error checks common to all metric types
 	$self->_error_checks( %args );
 	
+	#TODO revisit how i'm using $multiplier here
 	$self->_send_metric(
 		type        => 'counter',
 		name        => $args{'name'},
 		value       => 
 			( defined $args{'value'} && $args{'value'} ne '' )
-				? $args{'value'}
-				: 1,
+				? ( $args{'value'} * $multiplier )
+				: $multiplier,
 		tags        => 
 			defined $args{'tags'}
 				? $args{'tags'}
@@ -209,8 +266,6 @@ sub increment
 	return;
 }
 
-
-=head1 INTERNAL FUNCTIONS
 
 =head2 _error_checks()
 
@@ -291,6 +346,8 @@ sub _send_metric
 	# Metric name should only contain alphanumeric, "_", ".". Convert anything else to underscore and warn about substitution
 	# NOTE: Datadog will do this for you anyway, but won't warn you what the actual metric name will become.
 	$args{'name'} =~ s/[^a-zA-Z0-9_\.]/_/;
+	
+	#TODO change to Log::Any output
 	carp( "WARNING: converted metric name from >$original_name< to >", $args{'name'}, "<. Names should only contain: a-z, 0-9, underscores, and dots/periods." )
 		if $args{'name'} ne $original_name;
 	
