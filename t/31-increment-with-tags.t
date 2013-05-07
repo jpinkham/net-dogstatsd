@@ -5,6 +5,8 @@ use warnings;
 
 use Test::More tests => 8;
 use Test::Exception;
+use Test::FailWarnings -allow_deps => 1;
+use Test::Warn;
 
 use Net::Dogstatsd;
 
@@ -81,13 +83,14 @@ lives_ok(
 ) || diag ($dogstatsd );
 
 
-lives_ok(
+warning_like(
 	sub {
 		$dogstatsd->increment(
 			name => 'testmetric.request_count',
 			tags => [ 'tag+name&here:value' ],
 		);
 	},
+	qr/converted tag/,
 	'Increment: tag list with invalid item - WARN on disallowed characters',
 ) || diag ($dogstatsd );
 
