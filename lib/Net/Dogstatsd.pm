@@ -203,6 +203,58 @@ sub decrement
 }
 
 
+=head2 gauge()
+
+Send a 'gauge' metric. ex: gas gauge value, inventory stock level
+Include optional arrayref of tags/tag-values.
+
+	$dogstatsd->gauge(
+		name  => $metric_name,
+		value => $gauge_value,
+	);
+	
+	$dogstatsd->gauge(
+		name  => $metric_name,
+		value => $gauge_value,
+		tags  => [ 'tag1', 'tag2:value', 'tag3' ],
+	);
+
+=cut
+
+sub gauge
+{
+	my ( $self, %args ) = @_;
+	my $verbose = $self->verbose();
+	
+	# Check for mandatory parameters
+	foreach my $arg ( qw( name  value ) )
+	{
+		croak "Argument '$arg' is a required argument"
+			if !defined( $args{$arg} ) || ( $args{$arg} eq '' );
+	}
+	
+	# Check that value is a number
+	if ( defined( $args{'value' } ) )
+	{
+		croak "Value >$args{'value'}< is not a number, which is required for gauge()"
+			unless ( $args{'value'} =~ /^\d+(\.\d+)?$/ );
+	}
+	
+	# Error checks common to all metric types
+	$self->_error_checks( %args );
+	
+	$self->_send_metric(
+		type        => 'gauge',
+		value       => $args{'value'},
+		name        => $args{'name'},
+		tags        => defined $args{'tags'} ? $args{'tags'} : [],
+		sample_rate => defined $args{'sample_rate'} ? $args{'sample_rate'} : 1,
+	);
+	
+	return;
+}
+
+
 =head1 INTERNAL FUNCTIONS
 
 =head2 _counter
