@@ -297,7 +297,6 @@ sub _counter
 	# Error checks common to all metric types
 	$self->_error_checks( %args );
 	
-	#TODO revisit how i'm using $multiplier here
 	$self->_send_metric(
 		type        => 'counter',
 		name        => $args{'name'},
@@ -305,14 +304,8 @@ sub _counter
 			( defined $args{'value'} && $args{'value'} ne '' )
 				? ( $args{'value'} * $multiplier )
 				: $multiplier,
-		tags        => 
-			defined $args{'tags'}
-				? $args{'tags'}
-				: [],
-		sample_rate => 
-			defined $args{'sample_rate'}
-				? $args{'sample_rate'}
-				: 1,
+		tags        => defined $args{'tags'} ? $args{'tags'} : [],
+		sample_rate => defined $args{'sample_rate'} ? $args{'sample_rate'} : 1,
 	);
 	
 	return;
