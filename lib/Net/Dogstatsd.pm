@@ -237,7 +237,7 @@ sub gauge
 	if ( defined( $args{'value' } ) )
 	{
 		croak "Value >$args{'value'}< is not a number, which is required for gauge()"
-			unless ( $args{'value'} =~ /^\d+(\.\d+)?$/ );
+			unless Data::Validate::Type::is_number( $args{'value'}, positive => 1 );
 	}
 	
 	# Error checks common to all metric types
