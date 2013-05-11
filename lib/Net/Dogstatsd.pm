@@ -140,6 +140,7 @@ sub get_socket
 		}
 		catch
 		{
+			#TODO how to reach this to test it?
 			croak( "Could not open connection to metrics server. Error: >$_<" );
 		};
 	}
@@ -234,11 +235,8 @@ sub gauge
 	}
 	
 	# Check that value is a number
-	if ( defined( $args{'value' } ) )
-	{
-		croak "Value >$args{'value'}< is not a number, which is required for gauge()"
-			unless Data::Validate::Type::is_number( $args{'value'}, positive => 1 );
-	}
+	croak "Value >$args{'value'}< is not a number, which is required for gauge()"
+		unless Data::Validate::Type::is_number( $args{'value'}, positive => 1 );
 	
 	# Error checks common to all metric types
 	$self->_error_checks( %args );
@@ -342,11 +340,8 @@ sub timer
 	}
 	
 	# Check that value is a number
-	if ( defined( $args{'value' } ) )
-	{
-		croak "Value >$args{'value'}< is not a number, which is required for timer()"
-			unless Data::Validate::Type::is_number( $args{'value'}, positive => 1 );
-	}
+	croak "Value >$args{'value'}< is not a number, which is required for timer()"
+		unless Data::Validate::Type::is_number( $args{'value'}, positive => 1 );
 	
 	# Check that unit is one of the accepted values
 	unless ( $args{'unit'} =~ m/^(s|sec|ms)$/ )
