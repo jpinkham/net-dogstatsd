@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!perl -T
 
 use strict;
 use warnings;
@@ -18,7 +18,6 @@ ok(
 	'Net::Dogstatsd instance defined',
 );
 
-# test required argument
 throws_ok(
 	sub {
 		$dogstatsd->decrement();
