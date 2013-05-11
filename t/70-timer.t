@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 8;
 use Test::Exception;
 use Test::FailWarnings -allow_deps => 1;
 
@@ -78,5 +78,16 @@ lives_ok(
 			unit  => 'sec',
 		);
 	},
-	'Timer: specified metric, value, unit',
+	'Timer: specified metric, value, unit (sec)',
+);
+
+lives_ok(
+	sub {
+		$dogstatsd->timer(
+			name  => 'testmetric.timing.sample_sql',
+			value => 250,
+			unit  => 's',
+		);
+	},
+	'Timer: specified metric, value, unit(s)',
 );
