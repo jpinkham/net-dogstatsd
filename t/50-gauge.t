@@ -1,11 +1,10 @@
-#!/usr/local/bin/perl
+#!perl -T
 
 use strict;
 use warnings;
 
 use Test::More tests => 5;
 use Test::Exception;
-
 use Test::FailWarnings -allow_deps => 1;
 
 use Net::Dogstatsd;
@@ -19,13 +18,12 @@ ok(
 	'Net::Dogstatsd instance defined',
 );
 
-# test required argument
 throws_ok(
 	sub {
 		$dogstatsd->gauge();
 	},
 	qr/required argument/,
-	'Decrement: dies on missing required argument-metric name',
+	'Gauge: dies on missing required argument-metric name',
 );
 
 
@@ -34,9 +32,8 @@ throws_ok(
 		$dogstatsd->gauge( name => 'testmetric.inventory.onhand_minus_onhold' );
 	},
 	qr/required argument/,
-	'Gauge: without specifying value',
+	'Gauge: dies on missing required argument - metric value',
 );
-
 
 
 throws_ok(
@@ -49,6 +46,7 @@ throws_ok(
 	qr/not a number/,
 	'Gauge: non-numeric value',
 );
+
 
 lives_ok(
 	sub {
