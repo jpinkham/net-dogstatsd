@@ -154,12 +154,12 @@ sub get_socket
 Increment a counter metric. Include optional 'value' argument to increment by >1.
 Include optional arrayref of tags/tag-values.
 
-	$metric->increment(
+	$dogstatsd->increment(
 		name  => $metric_name,
 		value => $increment_value, #optional; default = 1
 	);
 	
-	$metric->increment(
+	$dogstatsd->increment(
 		name  => $metric_name,
 		value => $increment_value, #optional; default = 1
 		tags  => [ tag1, tag2:value, tag3 ],
@@ -181,12 +181,12 @@ sub increment
 Decrement a counter metric. Include optional 'value' argument to decrement by >1.
 Include optional arrayref of tags/tag-values.
 
-	$metric->decrement(
+	$dogstatsd->decrement(
 		name  => $metric_name,
 		value => $decrement_value, #optional; default = 1
 	);
 	
-	$metric->decrement(
+	$dogstatsd->decrement(
 		name  => $metric_name,
 		value => $decrement_value, #optional; default = 1
 		tags  => [ tag1, tag2:value, tag3 ],
@@ -255,6 +255,172 @@ sub gauge
 }
 
 
+=head2 histogram()
+
+Send a 'histogram' metric. Provides min/max/avg as well as 75th, 85th, 95th and 99th percentiles.
+NOTE: do not use this for timers. Use timer() instead.
+Include optional arrayref of tags/tag-values.
+
+	$dogstatsd->histogram(
+		name  => $metric_name,
+		value => $value,
+	);
+	
+	$dogstatsd->histogram(
+		name  => $metric_name,
+		value => $value,
+		tags  => [ 'tag1', 'tag2:value', 'tag3' ],
+	);
+
+=cut
+
+sub histogram
+{
+	my ( $self, %args ) = @_;
+	my $verbose = $self->verbose();
+	
+	# Check for mandatory parameters
+	foreach my $arg ( qw( name  value ) )
+	{
+		croak "Argument '$arg' is a required argument"
+			if !defined( $args{$arg} ) || ( $args{$arg} eq '' );
+	}
+	
+	# Check that value is a number
+	if ( defined( $args{'value' } ) )
+	{
+		croak "Value >$args{'value'}< is not a number, which is required for histogram()"
+			unless Data::Validate::Type::is_number( $args{'value'}, positive => 1 );
+	}
+	
+	# Error checks common to all metric types
+	$self->_error_checks( %args );
+	
+	$self->_send_metric(
+		type        => 'histogram',
+		value       => $args{'value'},
+		name        => $args{'name'},
+		tags        => defined $args{'tags'} ? $args{'tags'} : [],
+		sample_rate => defined $args{'sample_rate'} ? $args{'sample_rate'} : 1,
+	);
+	
+	return;
+}
+
+
+=head2 timer()
+
+Send a 'timer' metric. Provides min/max/avg as well as 75th, 85th, 95th and 99th percentiles.
+Ex: time to run a database query.
+Include optional arrayref of tags/tag-values.
+
+	$dogstatsd->timer(
+		name  => $metric_name,
+		value => $metric_value,
+		unit  => $metric_unit, # 'ms' (milliseconds) or 's|sec' (seconds)
+	);
+	
+	$dogstatsd->timer(
+		name  => $metric_name,
+		value => $metric_value,
+		unit  => $metric_unit, # 'ms' (milliseconds) or 's|sec' (seconds)
+		tags  => [ 'tag1', 'tag2:value', 'tag3' ],
+	);
+
+=cut
+
+sub timer
+{
+	my ( $self, %args ) = @_;
+	my $verbose = $self->verbose();
+	
+	# Check for mandatory parameters
+	foreach my $arg ( qw( name value unit ) )
+	{
+		croak "Argument '$arg' is a required argument for timer()"
+			if !defined( $args{$arg} ) || ( $args{$arg} eq '' );
+	}
+	
+	# Check that value is a number
+	if ( defined( $args{'value' } ) )
+	{
+		croak "Value >$args{'value'}< is not a number, which is required for timer()"
+			unless Data::Validate::Type::is_number( $args{'value'}, positive => 1 );
+	}
+	
+	# Check that unit is one of the accepted values
+	unless ( $args{'unit'} =~ m/^(s|sec|ms)$/ )
+	{
+		croak "Argument 'unit' has invalid value >" . $args{'unit'} . "<. Allowed values are 's', 'sec' or 'ms'";
+	}
+	
+	if ( $args{'unit'} eq 's' || $args{'unit'} eq 'sec' )
+	{
+		# Convert to milliseconds
+		$args{'value'} *= 1000;
+		$args{'value'} = sprintf( "%.2f", $args{'value'} ); #for things that run in microseconds
+	}
+	
+	# Error checks common to all metric types
+	$self->_error_checks( %args );
+	
+	$self->_send_metric(
+		type        => 'timer',
+		value       => $args{'value'},
+		name        => $args{'name'},
+		tags        => defined $args{'tags'} ? $args{'tags'} : [],
+		sample_rate => defined $args{'sample_rate'} ? $args{'sample_rate'} : 1,
+	);
+		
+	return;
+}
+
+
+=head2 sets()
+
+Send a 'sets' metric. Used to count the number of unique elements in a group. Ex: unique site visitors.
+Include optional arrayref of tags/tag-values.
+
+	$dogstatsd->sets(
+		name  => 'unique.site_visitors',
+		value => $account_id,
+	);
+	
+	$dogstatsd->sets(
+		name  => 'unique.site_visitors',
+		value => $account_id,
+		tags  => [ 'tag1', 'tag2:value', 'tag3' ],
+	);
+
+=cut
+
+sub sets
+{
+	my ( $self, %args ) = @_;
+	my $verbose = $self->verbose();
+	
+	# Check for mandatory parameters
+	foreach my $arg ( qw( name  value ) )
+	{
+		croak "Argument '$arg' is a required argument"
+			if !defined( $args{$arg} ) || ( $args{$arg} eq '' );
+	}
+	
+	# Error checks common to all metric types
+	$self->_error_checks( %args );
+	
+	$self->_send_metric(
+		type        => 'sets',
+		value       => $args{'value'},
+		name        => $args{'name'},
+		tags        => defined $args{'tags'} ? $args{'tags'} : [],
+		sample_rate => defined $args{'sample_rate'} ? $args{'sample_rate'} : 1,
+	);
+	
+	return;
+}
+
+
 =head1 INTERNAL FUNCTIONS
 
 =head2 _counter
@@ -290,7 +456,7 @@ sub _counter
 	# Check that value, if provided, is a positive integer
 	if ( defined( $args{'value' } ) )
 	{
-		croak "Value >$args{'value'}< is not a positive integer, which is required for " . $action . '()'
+		croak "Value >$args{'value'}< is not a positive integer, which is required for decrement()"
 			if ( $args{'value'} !~ /^\d+$/ || $args{'value'} <= 0 );
 	}
 	
