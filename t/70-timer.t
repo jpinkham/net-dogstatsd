@@ -3,9 +3,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test::More tests => 24;
 use Test::Exception;
 use Test::FailWarnings -allow_deps => 1;
+use Test::Warn;
 
 use Net::Dogstatsd;
 
@@ -70,6 +71,59 @@ throws_ok(
 	'Timer: dies on non-numeric value',
 );
 
+
+throws_ok(
+	sub {
+		$dogstatsd->timer(
+			name => '1testmetric.request_count',
+			value => 250,
+			unit  => 'sec',
+		);
+	},
+	qr/Invalid metric name/,
+	'Timer: dies with invalid metric name  - starting with number',
+);
+
+
+warning_like(
+	sub {
+		$dogstatsd->timer(
+			name => 'testmetric.request_count:',
+			value => 250,
+			unit  => 'sec',
+		);
+	},
+	qr/converted metric/,
+	'Timer: warns on translated metric name - colon',
+) || diag ($dogstatsd );
+
+
+warning_like(
+	sub {
+		$dogstatsd->timer(
+			name => 'testmetric.request_count|',
+			value => 250,
+			unit  => 'sec',
+		);
+	},
+	qr/converted metric/,
+	'Timer: warns on translated metric name - pipe',
+) || diag ($dogstatsd );
+
+
+warning_like(
+	sub {
+		$dogstatsd->timer(
+			name => 'testmetric.request_count@',
+			value => 250,
+			unit  => 'sec',
+		);
+	},
+	qr/converted metric/,
+	'Timer: warns on translated metric name - at sign',
+) || diag ($dogstatsd );
+
+
 lives_ok(
 	sub {
 		$dogstatsd->timer(
@@ -91,3 +145,174 @@ lives_ok(
 	},
 	'Timer: specified metric, value, unit(s)',
 );
+
+
+
+# Additional tag-specific tests
+
+throws_ok(
+	sub {
+		$dogstatsd->timer(
+			name => 'testmetric.timing.sample_sql',
+			value => 250,
+			unit  => 'sec',
+			tags => {},
+		);
+	},
+	qr/list is invalid/,
+	'Timer: dies unless tag list is a hashref',
+);
+
+
+throws_ok(
+	sub {
+		$dogstatsd->timer(
+			name => 'testmetric.timing.sample_sql',
+			value => 250,
+			unit  => 'sec',
+			tags => [ '1tag:value' ],
+		);
+	},
+	qr/Invalid tag/,
+	'Timer: dies when tag list contains invalid item - tag starting with number',
+);
+
+
+throws_ok(
+	sub {
+		$dogstatsd->timer(
+			name => 'testmetric.timing.sample_sql',
+			value => 250,
+			unit  => 'sec',
+			tags => [ 'tagabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz:value' ],
+		);
+	},
+	qr/Invalid tag/,
+	'Timer: dies when tag list contains invalid item - tag > 200 characters',
+);
+
+
+# This is a non-standard check, DataDog will allow it, but it will result in
+# confusion and unusual behavior in UI/graphing
+throws_ok(
+	sub {
+		$dogstatsd->timer(
+			name => 'testmetric.timing.sample_sql',
+			value => 250,
+			unit  => 'sec',
+			tags => [ 'tag:something:value' ],
+		);
+	},
+	qr/Invalid tag/,
+	'Timer: dies when tag list contains invalid item - two colons',
+);
+
+
+lives_ok(
+	sub {
+		$dogstatsd->timer(
+			name => 'testmetric.timing.sample_sql',
+			value => 250,
+			unit  => 'sec',
+			tags => [],
+		);
+	},
+	'Timer: empty tag list',
+) || diag ($dogstatsd );
+
+
+warning_like(
+	sub {
+		$dogstatsd->timer(
+			name => 'testmetric.timing.sample_sql',
+			value => 250,
+			unit  => 'sec',
+			tags => [ 'tag+name&here:value' ],
+		);
+	},
+	qr/converted tag/,
+	'Timer: tag list with invalid item - WARN on disallowed characters',
+) || diag ($dogstatsd );
+
+
+lives_ok(
+	sub {
+		$dogstatsd->timer(
+			name => 'testmetric.timing.sample_sql',
+			value => 250,
+			unit  => 'sec',
+			tags => [ 'testingtag', 'testtag:testvalue' ]
+		);
+	},
+	'Timer: specified metric, value, unit(sec), valid tag list',
+) || diag ($dogstatsd );
+
+
+# Additional sample rate-specific tests
+
+throws_ok(
+	sub {
+		$dogstatsd->timer(
+			name        => 'testmetric.request_count',
+			value => 250,
+			unit  => 'sec',
+			sample_rate => '',
+		);
+	},
+	qr/Invalid sample rate/,
+	'Timer: dies with empty sample_rate',
+);
+
+
+throws_ok(
+	sub {
+		$dogstatsd->timer(
+			name        => 'testmetric.request_count',
+			value => 250,
+			unit  => 'sec',
+			sample_rate => 2,
+		);
+	},
+	qr/Invalid sample rate/,
+	'Timer: dies with sample rate > 1',
+);
+
+
+dies_ok(
+	sub {
+		$dogstatsd->timer(
+			name => 'testmetric.request_count',
+			value => 250,
+			unit  => 'sec',
+			sample_rate => -1,
+		);
+	},
+	'Timer: dies with negative sample rate',
+);
+
+
+throws_ok(
+	sub {
+		$dogstatsd->timer(
+			name => 'testmetric.request_count',
+			value => 250,
+			unit  => 'sec',
+			sample_rate => 0,
+		);
+	},
+	qr/Invalid sample rate/,
+	'Timer: dies with sample rate of zero',
+);
+
+
+lives_ok(
+	sub {
+		$dogstatsd->timer(
+			name        => 'testmetric.request_count',
+			value => 250,
+			unit  => 'sec',
+			sample_rate => 0.5,
+		);
+	},
+	'Timer: valid sample rate',
+) || diag ($dogstatsd );

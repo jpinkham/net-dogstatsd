@@ -3,9 +3,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 21;
 use Test::Exception;
 use Test::FailWarnings -allow_deps => 1;
+use Test::Warn;
 
 use Net::Dogstatsd;
 
@@ -48,6 +49,56 @@ throws_ok(
 );
 
 
+throws_ok(
+	sub {
+		$dogstatsd->gauge(
+			name => '1testmetric.request_count',
+			value => 250,
+		);
+	},
+	qr/Invalid metric name/,
+	'Gauge: dies with invalid metric name  - starting with number',
+);
+
+
+warning_like(
+	sub {
+		$dogstatsd->gauge(
+			name => 'testmetric.request_count:',
+			value => 250,
+		);
+	},
+	qr/converted metric/,
+	'Gauge: warns on translated metric name - colon',
+) || diag ($dogstatsd );
+
+
+warning_like(
+	sub {
+		$dogstatsd->gauge(
+			name => 'testmetric.request_count|',
+			value => 250,
+		);
+	},
+	qr/converted metric/,
+	'Gauge: warns on translated metric name - pipe',
+) || diag ($dogstatsd );
+
+
+warning_like(
+	sub {
+		$dogstatsd->gauge(
+			name => 'testmetric.request_count@',
+			value => 250,
+		);
+	},
+	qr/converted metric/,
+	'Gauge: warns on translated metric name - at sign',
+) || diag ($dogstatsd );
+
+
+
+
 lives_ok(
 	sub {
 		$dogstatsd->gauge(
@@ -56,4 +107,162 @@ lives_ok(
 		);
 	},
 	'Gauge: specified valid metric name and value',
+) || diag ($dogstatsd );
+
+
+# Additional tag-specific tests
+
+throws_ok(
+	sub {
+		$dogstatsd->gauge(
+			name => 'testmetric.request_count',
+			value => 250,
+			tags => {},
+		);
+	},
+	qr/list is invalid/,
+	'Gauge: dies unless tag list is a hashref',
+);
+
+
+throws_ok(
+	sub {
+		$dogstatsd->gauge(
+			name => 'testmetric.request_count',
+			value => 250,
+			tags => [ '1tag:something:value' ],
+		);
+	},
+	qr/Invalid tag/,
+	'Gauge: dies when tag list contains invalid item - tag starting with number',
+);
+
+
+throws_ok(
+	sub {
+		$dogstatsd->gauge(
+			name => 'testmetric.request_count',
+			value => 250,
+			tags => [ 'tagabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz:value' ],
+		);
+	},
+	qr/Invalid tag/,
+	'Gauge: dies when tag list contains invalid item - tag > 200 characters',
+);
+
+
+# This is a non-standard check, DataDog will allow it, but it will result in
+# confusion and unusual behavior in UI/graphing
+throws_ok(
+	sub {
+		$dogstatsd->gauge(
+			name => 'testmetric.request_count',
+			value => 250,
+			tags => [ 'tag:something:value' ],
+		);
+	},
+	qr/Invalid tag/,
+	'Gauge: dies when tag list contains invalid item - two colons',
+);
+
+
+lives_ok(
+	sub {
+		$dogstatsd->gauge(
+			name => 'testmetric.request_count',
+			value => 250,
+			tags => [],
+		);
+	},
+	'Gauge: empty tag list',
+) || diag ($dogstatsd );
+
+
+warning_like(
+	sub {
+		$dogstatsd->gauge(
+			name => 'testmetric.request_count',
+			value => 250,
+			tags => [ 'tag+name&here:value' ],
+		);
+	},
+	qr/converted tag/,
+	'Gauge: tag list with invalid item - WARN on disallowed characters',
+) || diag ($dogstatsd );
+
+
+lives_ok(
+	sub {
+		$dogstatsd->gauge(
+			name => 'testmetric.request_count',
+			value => 250,
+			tags => [ 'testingtag', 'testtag:testvalue' ]
+		);
+	},
+	'Gauge: valid tag list',
+) || diag ($dogstatsd );
+
+
+# Additional sample rate-specific tests
+
+throws_ok(
+	sub {
+		$dogstatsd->gauge(
+			name        => 'testmetric.request_count',
+			value => 250,
+			sample_rate => '',
+		);
+	},
+	qr/Invalid sample rate/,
+	'Gauge: dies with empty sample_rate',
+);
+
+
+throws_ok(
+	sub {
+		$dogstatsd->gauge(
+			name        => 'testmetric.request_count',
+			value => 250,
+			sample_rate => 2,
+		);
+	},
+	qr/Invalid sample rate/,
+	'Gauge: dies with sample rate > 1',
+);
+
+
+dies_ok(
+	sub {
+		$dogstatsd->gauge(
+			name => 'testmetric.request_count',
+			value => 250,
+			sample_rate => -1,
+		);
+	},
+	'Gauge: dies with negative sample rate',
+);
+
+
+throws_ok(
+	sub {
+		$dogstatsd->gauge(
+			name => 'testmetric.request_count',
+			value => 250,
+			sample_rate => 0,
+		);
+	},
+	qr/Invalid sample rate/,
+	'Gauge: dies with sample rate of zero',
+);
+
+
+lives_ok(
+	sub {
+		$dogstatsd->gauge(
+			name        => 'testmetric.request_count',
+			value => 250,
+			sample_rate => 0.5,
+		);
+	},
+	'Gauge: valid sample rate',
 ) || diag ($dogstatsd );
