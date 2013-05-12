@@ -3,9 +3,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 23;
 use Test::Exception;
 use Test::FailWarnings -allow_deps => 1;
+use Test::Warn;
 
 use Net::Dogstatsd;
 
@@ -18,6 +19,8 @@ ok(
 	'Net::Dogstatsd instance defined',
 );
 
+
+# test required argument
 throws_ok(
 	sub {
 		$dogstatsd->decrement();
@@ -25,6 +28,51 @@ throws_ok(
 	qr/required argument/,
 	'Decrement: dies on missing required argument-metric name',
 );
+
+
+
+throws_ok(
+	sub {
+		$dogstatsd->decrement(
+			name => '1testmetric.request_count',
+		);
+	},
+	qr/Invalid metric name/,
+	'Decrement: dies with invalid metric name  - starting with number',
+);
+
+
+warning_like(
+	sub {
+		$dogstatsd->decrement(
+			name => 'testmetric.request_count:',
+		);
+	},
+	qr/converted metric/,
+	'Decrement: warns on translated metric name - colon',
+) || diag ($dogstatsd );
+
+
+warning_like(
+	sub {
+		$dogstatsd->decrement(
+			name => 'testmetric.request_count|',
+		);
+	},
+	qr/converted metric/,
+	'Decrement: warns on translated metric name - pipe',
+) || diag ($dogstatsd );
+
+
+warning_like(
+	sub {
+		$dogstatsd->decrement(
+			name => 'testmetric.request_count@',
+		);
+	},
+	qr/converted metric/,
+	'Decrement: warns on translated metric name - at sign',
+) || diag ($dogstatsd );
 
 
 throws_ok(
@@ -81,3 +129,147 @@ lives_ok(
 	'Decrement: specified metric name and value',
 ) || diag ($dogstatsd );
 
+# Additional tag-specific tests
+
+throws_ok(
+	sub {
+		$dogstatsd->decrement(
+			name => 'testmetric.request_count',
+			tags => {},
+		);
+	},
+	qr/list is invalid/,
+	'Decrement: dies unless tag list is a hashref',
+);
+
+
+throws_ok(
+	sub {
+		$dogstatsd->decrement(
+			name => 'testmetric.request_count',
+			tags => [ '1tag:something:value' ],
+		);
+	},
+	qr/Invalid tag/,
+	'Decrement: dies when tag list contains invalid item - tag starting with number',
+);
+
+
+throws_ok(
+	sub {
+		$dogstatsd->decrement(
+			name => 'testmetric.request_count',
+			tags => [ 'tagabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz:value' ],
+		);
+	},
+	qr/Invalid tag/,
+	'Decrement: dies when tag list contains invalid item - tag > 200 characters',
+);
+
+
+# This is a non-standard check, DataDog will allow it, but it will result in
+# confusion and unusual behavior in UI/graphing
+throws_ok(
+	sub {
+		$dogstatsd->decrement(
+			name => 'testmetric.request_count',
+			tags => [ 'tag:something:value' ],
+		);
+	},
+	qr/Invalid tag/,
+	'Decrement: dies when tag list contains invalid item - two colons',
+);
+
+
+lives_ok(
+	sub {
+		$dogstatsd->decrement(
+			name => 'testmetric.request_count',
+			tags => [],
+		);
+	},
+	'Decrement: empty tag list',
+) || diag ($dogstatsd );
+
+
+warning_like(
+	sub {
+		$dogstatsd->decrement(
+			name => 'testmetric.request_count',
+			tags => [ 'tag+name&here:value' ],
+		);
+	},
+	qr/converted tag/,
+	'Decrement: tag list with invalid item - WARN on disallowed characters',
+) || diag ($dogstatsd );
+
+
+lives_ok(
+	sub {
+		$dogstatsd->decrement(
+			name => 'testmetric.request_count',
+			tags => [ 'testingtag', 'testtag:testvalue' ]
+		);
+	},
+	'Decrement: valid tag list',
+) || diag ($dogstatsd );
+
+
+# Additional sample rate-specific tests
+
+throws_ok(
+	sub {
+		$dogstatsd->decrement(
+			name        => 'testmetric.request_count',
+			sample_rate => '',
+		);
+	},
+	qr/Invalid sample rate/,
+	'Decrement: dies with empty sample_rate',
+);
+
+
+throws_ok(
+	sub {
+		$dogstatsd->decrement(
+			name        => 'testmetric.request_count',
+			sample_rate => 2,
+		);
+	},
+	qr/Invalid sample rate/,
+	'Decrement: dies with sample rate > 1',
+);
+
+
+dies_ok(
+	sub {
+		$dogstatsd->decrement(
+			name => 'testmetric.request_count',
+			sample_rate => -1,
+		);
+	},
+	'Decrement: dies with negative sample rate',
+);
+
+
+throws_ok(
+	sub {
+		$dogstatsd->decrement(
+			name => 'testmetric.request_count',
+			sample_rate => 0,
+		);
+	},
+	qr/Invalid sample rate/,
+	'Decrement: dies with sample rate of zero',
+);
+
+
+lives_ok(
+	sub {
+		$dogstatsd->decrement(
+			name        => 'testmetric.request_count',
+			sample_rate => 0.5,
+		);
+	},
+	'Decrement: valid sample rate',
+) || diag ($dogstatsd );
