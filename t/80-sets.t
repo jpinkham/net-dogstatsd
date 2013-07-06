@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 20;
+use Test::More tests => 21;
 use Test::FailWarnings -allow_deps => 1;
 use Test::Exception;
 use Test::Warn;
@@ -146,6 +146,18 @@ throws_ok(
 	},
 	qr/Invalid tag/,
 	'Sets: dies when tag list contains invalid item - two colons',
+);
+
+
+throws_ok(
+	sub {
+		$dogstatsd->sets(
+			name => 'testmetric.request_count',
+			value => '',
+		);
+	},
+	qr/required argument/,
+	'Sets: dies with empty value',
 );
 
 

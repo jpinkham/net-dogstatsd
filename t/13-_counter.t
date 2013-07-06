@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More tests => 4;
 use Test::FailWarnings -allow_deps => 1;
 use Test::Exception;
 
@@ -25,3 +25,23 @@ throws_ok(
 	qr/invalid action/,
 	'_counter: Dies on invalid action'
 );
+
+
+throws_ok(
+	sub {
+		$dogstatsd->_counter( action => 'foo' );
+	},
+	qr/invalid action/,
+	'_counter: Dies on invalid action'
+);
+
+
+throws_ok(
+	sub {
+		$dogstatsd->_counter( action => 'foo' );
+	},
+	qr/invalid action/,
+	'_counter: Dies on invalid action'
+);
+
+

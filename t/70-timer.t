@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 24;
+use Test::More tests => 26;
 use Test::Exception;
 use Test::FailWarnings -allow_deps => 1;
 use Test::Warn;
@@ -69,6 +69,19 @@ throws_ok(
 	},
 	qr/not a number/,
 	'Timer: dies on non-numeric value',
+);
+
+
+throws_ok(
+	sub {
+		$dogstatsd->timer(
+			name  => 'testmetric.timing.sample_sql',
+			value => '',
+			unit  => 'sec',
+		);
+	},
+	qr/required argument/,
+	'Timer: dies on empty value',
 );
 
 
@@ -146,6 +159,16 @@ lives_ok(
 	'Timer: specified metric, value, unit(s)',
 );
 
+lives_ok(
+	sub {
+		$dogstatsd->timer(
+			name  => 'testmetric.timing.sample_sql',
+			value => 250,
+			unit  => 'ms',
+		);
+	},
+	'Timer: specified metric, value, unit(ms)',
+);
 
 
 # Additional tag-specific tests

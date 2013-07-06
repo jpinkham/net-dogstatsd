@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 21;
+use Test::More tests => 22;
 use Test::FailWarnings -allow_deps => 1;
 use Test::Exception;
 use Test::Warn;
@@ -46,6 +46,18 @@ throws_ok(
 	},
 	qr/not a number/,
 	'Histogram: dies on non-numeric value',
+);
+
+
+throws_ok(
+	sub {
+		$dogstatsd->histogram(
+			name  => 'testmetric.inventory.onhand_minus_onhold',
+			value => '',
+		);
+	},
+	qr/required argument/,
+	'Histogram: dies on empty value',
 );
 
 

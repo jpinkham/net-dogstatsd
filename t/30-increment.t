@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 23;
+use Test::More tests => 24;
 use Test::Exception;
 use Test::FailWarnings -allow_deps => 1;
 use Test::Warn;
@@ -85,6 +85,16 @@ throws_ok(
 	'Increment: dies on non-numeric value',
 );
 
+throws_ok(
+	sub {
+		$dogstatsd->increment(
+			name  => 'testmetric.request_count',
+			value => ''
+		);
+	},
+	qr/not a positive integer/,
+	'Increment: dies with an empty value',
+);
 
 throws_ok(
 	sub {

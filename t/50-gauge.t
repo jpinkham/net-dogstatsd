@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 21;
+use Test::More tests => 22;
 use Test::Exception;
 use Test::FailWarnings -allow_deps => 1;
 use Test::Warn;
@@ -48,6 +48,17 @@ throws_ok(
 	'Gauge: non-numeric value',
 );
 
+
+throws_ok(
+	sub {
+		$dogstatsd->gauge(
+			name  => 'testmetric.inventory.onhand_minus_onhold',
+			value => '',
+		);
+	},
+	qr/required argument/,
+	'Gauge: Dies on empty value',
+);
 
 throws_ok(
 	sub {
