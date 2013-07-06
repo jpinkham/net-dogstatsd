@@ -55,6 +55,9 @@ All metric names, values, and tags are converted to lower case before
 sending. This was done to prevent multiple instances of the same metric/tag name
 but with varying case. 
 
+Tags that contain more than 1 colon (:) will not be allowed. Even though Datadog
+allows this, the results when trying to graph by tag are confusing/unexpected.
+
 Also, whitespace (and other special characters) in tags and metric names are
 automatically replaced with "_". Warnings are printed whenever characters are
 replaced in the metric name. Datadog will make similar changes for you
