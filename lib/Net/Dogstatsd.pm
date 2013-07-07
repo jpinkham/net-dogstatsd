@@ -449,7 +449,7 @@ sub _counter
 	}
 	
 	# Check that value, if provided, is a positive integer
-	if ( defined( $args{'value' } ) )
+	if ( defined( $args{'value'} ) )
 	{
 		croak "Value >$args{'value'}< is not a positive integer, which is required for decrement()"
 			if ( $args{'value'} !~ /^\d+$/ || $args{'value'} <= 0 );
@@ -493,7 +493,7 @@ sub _error_checks
 	}
 	
 	# Tags, if exist...
-	if ( defined( $args{'tags'} ) && scalar( $args{'tags'} ) != 0 )
+	if ( defined( $args{'tags'} ) && scalar( @{ $args{'tags'} } ) != 0 )
 	{
 		if ( !Data::Validate::Type::is_arrayref( $args{'tags'} ) )
 		{
