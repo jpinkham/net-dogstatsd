@@ -147,8 +147,8 @@ throws_ok(
 			tags => {},
 		);
 	},
-	qr/list is invalid/,
-	'Increment: dies unless tag list is a hashref',
+	qr/Not an ARRAY reference/,
+	'Increment: dies unless tag list is an arrayref',
 );
 
 

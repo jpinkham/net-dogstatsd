@@ -182,8 +182,8 @@ throws_ok(
 			tags => {},
 		);
 	},
-	qr/list is invalid/,
-	'Timer: dies unless tag list is a hashref',
+	qr/Not an ARRAY reference/,
+	'Timer: dies unless tag list is an arrayref',
 );
 
 

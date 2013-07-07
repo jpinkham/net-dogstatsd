@@ -131,8 +131,8 @@ throws_ok(
 			tags => {},
 		);
 	},
-	qr/list is invalid/,
-	'Gauge: dies unless tag list is a hashref',
+	qr/Not an ARRAY reference/,
+	'Gauge: dies unless tag list is an arrayref',
 );
 
 

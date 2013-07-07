@@ -103,8 +103,8 @@ throws_ok(
 			tags => {},
 		);
 	},
-	qr/list is invalid/,
-	'Sets: dies unless tag list is a hashref',
+	qr/Not an ARRAY reference/,
+	'Sets: dies unless tag list is an arrayref',
 );
 
 

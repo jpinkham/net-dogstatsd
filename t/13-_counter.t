@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More tests => 3;
 use Test::FailWarnings -allow_deps => 1;
 use Test::Exception;
 
@@ -27,21 +27,31 @@ throws_ok(
 );
 
 
-throws_ok(
-	sub {
-		$dogstatsd->_counter( action => 'foo' );
-	},
-	qr/invalid action/,
-	'_counter: Dies on invalid action'
-);
-
 
 throws_ok(
 	sub {
-		$dogstatsd->_counter( action => 'foo' );
+		$dogstatsd->_counter(
+			name   => 'test_counter',
+			action => 'increment',
+			value  => '',
+		);
 	},
-	qr/invalid action/,
-	'_counter: Dies on invalid action'
+	qr/positive integer/,
+	'_counter: Dies on empty value'
 );
 
 
+#**|throws_ok(
+#**|	sub {
+#**|		$dogstatsd->_counter(
+#**|			name   => 'test_counter',
+#**|			action => 'increment',
+#**|			value  => 1,
+#**|			tags   => [],
+#**|		);
+#**|	},
+#**|	qr/positive integer/,
+#**|	'_counter: Dies on empty tag list'
+#**|);
+#**|
+#**|

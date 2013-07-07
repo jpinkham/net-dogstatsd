@@ -130,8 +130,8 @@ throws_ok(
 			tags => {},
 		);
 	},
-	qr/list is invalid/,
-	'Histogram: dies unless tag list is a hashref',
+	qr/Not an ARRAY reference/,
+	'Histogram: dies unless tag list is an arrayref',
 );
 
 

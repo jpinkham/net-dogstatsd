@@ -138,8 +138,8 @@ throws_ok(
 			tags => {},
 		);
 	},
-	qr/list is invalid/,
-	'Decrement: dies unless tag list is a hashref',
+	qr/Not an ARRAY reference/,
+	'Decrement: dies unless tag list is an arrayref',
 );
 
 
