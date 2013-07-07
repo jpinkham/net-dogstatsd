@@ -135,7 +135,7 @@ sub get_socket
 				PeerPort => $self->{'port'},
 				Proto    => 'udp'
 				) 
-			|| die "Could not open UDP connection to" . $self->{'host'} . ":" . $self->{'port'};
+			|| die "Could not open UDP connection to" . $self->{'host'} . ":" . $self->{'port'} . "\n";
 			
 		}
 		catch
@@ -588,7 +588,7 @@ sub _send_metric
 	# metric name/tag
 	$metric_string = lc( $metric_string );
 	
-	warn( "\nbuilt metric string >$metric_string<" ) if $verbose;
+	carp( "\nbuilt metric string >$metric_string<" ) if $verbose;
 	
 	# Use of rand() is how the Ruby and Python clients implement sampling, so we will too.
 	if ( $args{'sample_rate'} == 1 || ( rand() < $args{'sample_rate'} ) )
