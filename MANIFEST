@@ -1,4 +1,5 @@
 .perlcriticrc
+.travis.yml
 Build.PL
 Changes
 ignore.txt
@@ -9,9 +10,19 @@ MANIFEST
 MANIFEST.SKIP
 META.json
 META.yml
-README
+README.md
 t/00-load.t
 t/10-new.t
+t/12-_send_metric.t
+t/13-_counter.t
+t/15-verbose.t
+t/20-get_socket.t
+t/30-increment.t
+t/40-decrement.t
+t/50-gauge.t
+t/60-histogram.t
+t/70-timer.t
+t/80-sets.t
 xt/changes.t
 xt/kwalitee.t
 xt/manifest.t
