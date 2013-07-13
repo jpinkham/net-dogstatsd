@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 23;
+use Test::Most 'bail', tests => 23;
 use Test::FailWarnings -allow_deps => 1;
 
 

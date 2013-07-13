@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 3;
+use Test::Most 'bail', tests => 3;
 
 use Net::Dogstatsd;
 
