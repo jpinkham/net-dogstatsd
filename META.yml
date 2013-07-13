@@ -5,9 +5,8 @@ author:
 build_requires:
   Scalar::Util: 0
   Storable: 0
-  Test::Exception: 0
-  Test::More: 0.94
-  Test::NoWarnings: 0
+  Test::FailWarnings: 0
+  Test::Most: 0
 configure_requires:
   Module::Build: 0
 dynamic_config: 1
