@@ -65,7 +65,7 @@ throws_ok(
 			unit  => 'sec',
 		);
 	},
-	qr/not a number/,
+	qr/not a positive number/,
 	'Timer: dies on non-numeric value',
 );
 
