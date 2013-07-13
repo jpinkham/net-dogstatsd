@@ -270,6 +270,7 @@ sub decrement
 =head2 gauge()
 
 Send a 'gauge' metric. ex: gas gauge value, inventory stock level
+Value must be positive number.
 Include optional arrayref of tags/tag-values.
 
 	$dogstatsd->gauge(
@@ -299,7 +300,7 @@ sub gauge
 	
 	# Check that value is a number
 	croak "Value >$args{'value'}< is not a number, which is required for gauge()"
-		unless Data::Validate::Type::is_number( $args{'value'}, positive => 1 );
+		unless Data::Validate::Type::is_number( $args{'value'} );
 	
 	# Error checks common to all metric types
 	$self->_error_checks( %args );
@@ -351,7 +352,7 @@ sub histogram
 	if ( defined( $args{'value' } ) )
 	{
 		croak "Value >$args{'value'}< is not a number, which is required for histogram()"
-			unless Data::Validate::Type::is_number( $args{'value'}, positive => 1 );
+			unless Data::Validate::Type::is_number( $args{'value'} );
 	}
 	
 	# Error checks common to all metric types
@@ -402,8 +403,8 @@ sub timer
 			if !defined( $args{$arg} ) || ( $args{$arg} eq '' );
 	}
 	
-	# Check that value is a number
-	croak "Value >$args{'value'}< is not a number, which is required for timer()"
+	# Check that value is a positive number
+	croak "Value >$args{'value'}< is not a positive number, which is required for timer()"
 		unless Data::Validate::Type::is_number( $args{'value'}, positive => 1 );
 	
 	# Check that unit is one of the accepted values
