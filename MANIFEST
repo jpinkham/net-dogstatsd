@@ -2,6 +2,7 @@
 .travis.yml
 Build.PL
 Changes
+examples/examples.pl
 ignore.txt
 lib/Net/Dogstatsd.pm
 LICENSE
