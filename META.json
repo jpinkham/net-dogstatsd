@@ -42,7 +42,7 @@
    "provides" : {
       "Net::Dogstatsd" : {
          "file" : "lib/Net/Dogstatsd.pm",
-         "version" : "v0.9.0"
+         "version" : "v1.0.0"
       }
    },
    "release_status" : "stable",
@@ -58,5 +58,5 @@
          "url" : "https://github.com/jpinkham/net-dogstatsd"
       }
    },
-   "version" : "v0.9.0"
+   "version" : "v1.0.0"
 }
