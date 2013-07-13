@@ -39,10 +39,12 @@ Submit them with the sets() method.
 
 
 NOTES
-Choose metric names wisely. The first portion of the metric name will determine
+Choose metric names wisely! The first portion of the metric name will determine
 the (auto-created) dashboard where the metric will appear. You can end up with
 a large amount of auto-created dashboards if you use many different names in
-the first portion of the metric name.
+the first portion of the metric name. You will have to contact Datadog to remove 
+any dashboards that are auto-created, that you do not want.
+
 Examples:
 Metric Name                           Dashboard
 ------------------------------------------------------------------------------
@@ -50,10 +52,12 @@ testmetric.requests                   testmetric
 traffic.pages_per_second              traffic
 testmetric.cs.customer_contacts       testmetric
 
-	
+
 All metric names, values, and tags are converted to lower case before
 sending. This was done to prevent multiple instances of the same metric/tag name
 but with varying case. 
+
+One or more tags can be optionally specified with any metric.
 
 Tags that contain more than 1 colon (:) will not be allowed. Even though Datadog
 allows this, the results when trying to graph by tag are confusing/unexpected.
