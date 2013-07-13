@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
-use Test::Exception;
+use Test::Most tests => 3;
 
 use Net::Dogstatsd;
 

@@ -3,10 +3,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 21;
+use Test::Most tests => 21;
 use Test::FailWarnings -allow_deps => 1;
-use Test::Exception;
-use Test::Warn;
 
 use Net::Dogstatsd;
 
