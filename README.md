@@ -25,23 +25,26 @@ and decrement() methods.
 
  * gauge
 
-Gauges are used for 
+Gauges measure the value of something over time.
+
 Submit them with the gauge() method.
 
  * histogram
 
-Histograms are used for
+Histograms measure the statistical distribution of a set of values.
 Submit them with the histogram() method.
 
  * timer
 
-Timers are used for measuring the duration of an activity. They are a special
+Timers measure the duration of an activity. They are a special
 type of histogram.
+
 Submit them with the timer() method.
 
  * set
 
 Sets are special versions of a counter, for tracking unique items in a group.
+
 Submit them with the sets() method.
 
 
@@ -54,8 +57,8 @@ the first portion of the metric name. You will have to contact Datadog to remove
 any dashboards that are auto-created, that you do not want.
 
 Examples:
-    Metric Name                           Dashboard
-    --------------------------------------------------------------------------
+
+    -Metric Name-                         -Dashboard-
     testmetric.requests                   testmetric
     traffic.pages_per_second              traffic
     testmetric.cs.customer_contacts       testmetric
