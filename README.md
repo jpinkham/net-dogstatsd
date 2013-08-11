@@ -16,6 +16,12 @@ interact. Datadog is a service for IT, Operations and Development teams who writ
 and run applications at scale, and want to turn the massive amounts of data
 produced by their apps, tools and services into actionable insight."
 
+Build status:  [![Build Status](https://travis-ci.org/jpinkham/net-dogstatsd.png)](https://travis-ci.org/jpinkham/net-dogstatsd) 
+
+
+Test coverage: [![Coverage Status](https://coveralls.io/repos/jpinkham/net-dogstatsd/badge.png?branch=master)](https://coveralls.io/r/jpinkham/net-dogstatsd?branch=master)
+
+
 Available metric types:
 
  * counter
