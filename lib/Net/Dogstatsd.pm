@@ -730,9 +730,8 @@ L<https://metacpan.org/release/Net-Dogstatsd>
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to ThinkGeek (<http://www.thinkgeek.com/>) and its parent company
-Geeknet (<http://www.geek.net/>), for allowing me to release code that was
-partially developed on company time.
+I originally developed this project for ThinkGeek (L<http://www.thinkgeek.com/>). 
+Thanks for allowing me to open-source it!
 
 =head1 COPYRIGHT & LICENSE
 
