@@ -19,23 +19,28 @@ produced by their apps, tools and services into actionable insight."
 Available metric types:
 
  * counter
+
 Counters can be incremented and decremented by any amount, via the increment()
 and decrement() methods.
 
  * gauge
+
 Gauges are used for 
 Submit them with the gauge() method.
 
  * histogram
+
 Histograms are used for
 Submit them with the histogram() method.
 
  * timer
+
 Timers are used for measuring the duration of an activity. They are a special
 type of histogram.
 Submit them with the timer() method.
 
  * set
+
 Sets are special versions of a counter, for tracking unique items in a group.
 Submit them with the sets() method.
 
@@ -49,11 +54,11 @@ the first portion of the metric name. You will have to contact Datadog to remove
 any dashboards that are auto-created, that you do not want.
 
 Examples:
-Metric Name                           Dashboard
-------------------------------------------------------------------------------
-testmetric.requests                   testmetric
-traffic.pages_per_second              traffic
-testmetric.cs.customer_contacts       testmetric
+    Metric Name                           Dashboard
+    --------------------------------------------------------------------------
+    testmetric.requests                   testmetric
+    traffic.pages_per_second              traffic
+    testmetric.cs.customer_contacts       testmetric
 
 
 All metric names, values, and tags are converted to lower case before
