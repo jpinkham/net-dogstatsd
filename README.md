@@ -1,6 +1,8 @@
 Net-Dogstatsd
+=============
 
 DESCRIPTION
+-----------
 This module provides a simple Perl client to 'dogstatsd', a daemon provided with
 the Datadog agent software. The purpose of dogstatsd is to aggregate the sending
 of metrics to the Datadog service.  dogstatsd is very similar to statsd, but
@@ -16,29 +18,30 @@ produced by their apps, tools and services into actionable insight."
 
 Available metric types:
 
-* counter
+ * counter
 Counters can be incremented and decremented by any amount, via the increment()
 and decrement() methods.
 
-* gauge
+ * gauge
 Gauges are used for 
 Submit them with the gauge() method.
 
-* histogram
+ * histogram
 Histograms are used for
 Submit them with the histogram() method.
 
-* timer
+ * timer
 Timers are used for measuring the duration of an activity. They are a special
 type of histogram.
 Submit them with the timer() method.
 
-* set
+ * set
 Sets are special versions of a counter, for tracking unique items in a group.
 Submit them with the sets() method.
 
 
 NOTES
+-----
 Choose metric names wisely! The first portion of the metric name will determine
 the (auto-created) dashboard where the metric will appear. You can end up with
 a large amount of auto-created dashboards if you use many different names in
@@ -69,6 +72,7 @@ automatically, but this happens silently and, as a result, can make it harder to
 find the resulting metrics within your dashboards.
 
 INSTALLATION
+------------
 
 To install this module, run the following commands:
 
@@ -78,6 +82,7 @@ To install this module, run the following commands:
     ./Build install
 
 SUPPORT AND DOCUMENTATION
+-------------------------
 
 After installing, you can find documentation for this module with the
 perldoc command.
