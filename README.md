@@ -117,6 +117,7 @@ You can also look for information at:
 
 
 LICENSE AND COPYRIGHT
+---------------------
 
 Copyright (C) 2013 Jennifer Pinkham
 
