@@ -103,17 +103,17 @@ perldoc command.
 
 You can also look for information at:
 
-    GitHub's request tracker (report bugs here)
-        https://github.com/jpinkham/net-dogstatsd/issues
+ * [GitHub's request tracker (report bugs here)]
+	(https://github.com/jpinkham/net-dogstatsd/issues)
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Net-Dogstatsd
+ * [AnnoCPAN, Annotated CPAN documentation]
+	(http://annocpan.org/dist/Net-Dogstatsd)
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Net-Dogstatsd
+ * [CPAN Ratings]
+	(http://cpanratings.perl.org/d/Net-Dogstatsd)
 
-    MetaCPAN
-        https://metacpan.org/release/Net-Dogstatsd/
+ * [MetaCPAN]
+	(https://metacpan.org/release/Net-Dogstatsd/)
 
 
 LICENSE AND COPYRIGHT
