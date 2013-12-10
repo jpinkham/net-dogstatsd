@@ -1,2 +1,4 @@
 v1.0.0  2013-07-15
         First release.
+v1.0.1  2013-12-09
+        Fixed some tests to work in cases where dogstatsd is not available.
