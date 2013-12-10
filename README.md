@@ -19,6 +19,8 @@ produced by their apps, tools and services into actionable insight."
 
 Test coverage: [![Coverage Status](https://coveralls.io/repos/jpinkham/net-dogstatsd/badge.png?branch=master)](https://coveralls.io/r/jpinkham/net-dogstatsd?branch=master)
 
+Build status:  [![Build Status](https://travis-ci.org/jpinkham/net-dogstatsd.png)](https://travis-ci.org/jpinkham/net-dogstatsd)
+
 
 Available metric types:
 
