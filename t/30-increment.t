@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Test::Most 'bail', tests => 24;
-use Test::FailWarnings -allow_deps => 1;
 
 use Net::Dogstatsd;
 
@@ -50,7 +49,7 @@ warning_like(
 ) || diag ($dogstatsd );
 
 
-warning_like(
+warnings_exist(
 	sub {
 		$dogstatsd->increment(
 			name => 'testmetric.request_count|',
@@ -61,7 +60,7 @@ warning_like(
 ) || diag ($dogstatsd );
 
 
-warning_like(
+warnings_exist(
 	sub {
 		$dogstatsd->increment(
 			name => 'testmetric.request_count@',

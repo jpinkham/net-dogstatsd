@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Test::Most 'bail', tests => 22;
-use Test::FailWarnings -allow_deps => 1;
 
 use Net::Dogstatsd;
 
@@ -71,7 +70,7 @@ throws_ok(
 );
 
 
-warning_like(
+warnings_exist(
 	sub {
 		$dogstatsd->histogram(
 			name => 'testmetric.request_count:',
@@ -83,7 +82,7 @@ warning_like(
 ) || diag ($dogstatsd );
 
 
-warning_like(
+warnings_exist(
 	sub {
 		$dogstatsd->histogram(
 			name => 'testmetric.request_count|',
@@ -95,7 +94,7 @@ warning_like(
 ) || diag ($dogstatsd );
 
 
-warning_like(
+warnings_exist(
 	sub {
 		$dogstatsd->histogram(
 			name => 'testmetric.request_count@',
@@ -186,7 +185,7 @@ lives_ok(
 ) || diag ($dogstatsd );
 
 
-warning_like(
+warnings_exist(
 	sub {
 		$dogstatsd->histogram(
 			name => 'testmetric.request_count',
