@@ -19,7 +19,7 @@ name: Net-Dogstatsd
 provides:
   Net::Dogstatsd:
     file: lib/Net/Dogstatsd.pm
-    version: v1.0.0
+    version: v1.0.2
 requires:
   Carp: 0
   Data::Dumper: 0
@@ -33,4 +33,4 @@ resources:
   homepage: https://metacpan.org/release/Net-Dogstatsd
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: https://github.com/jpinkham/net-dogstatsd
-version: v1.0.0
+version: v1.0.2
