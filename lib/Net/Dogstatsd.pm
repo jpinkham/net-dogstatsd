@@ -351,11 +351,8 @@ sub histogram
 	}
 	
 	# Check that value is a number
-	if ( defined( $args{'value' } ) )
-	{
-		croak "Value >$args{'value'}< is not a number, which is required for histogram()"
-			unless Data::Validate::Type::is_number( $args{'value'} );
-	}
+	croak "Value >$args{'value'}< is not a number, which is required for histogram()"
+		unless Data::Validate::Type::is_number( $args{'value'} );
 	
 	# Error checks common to all metric types
 	$self->_error_checks( %args );
