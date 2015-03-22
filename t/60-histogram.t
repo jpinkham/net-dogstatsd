@@ -238,7 +238,7 @@ throws_ok(
 );
 
 
-dies_ok(
+throws_ok(
 	sub {
 		$dogstatsd->histogram(
 			name => 'testmetric.request_count',
@@ -246,6 +246,7 @@ dies_ok(
 			sample_rate => -1,
 		);
 	},
+	qr/Invalid sample rate/,
 	'Histogram: dies with negative sample rate',
 );
 

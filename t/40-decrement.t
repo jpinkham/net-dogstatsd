@@ -238,13 +238,14 @@ throws_ok(
 );
 
 
-dies_ok(
+throws_ok(
 	sub {
 		$dogstatsd->decrement(
 			name => 'testmetric.request_count',
 			sample_rate => -1,
 		);
 	},
+	qr/Invalid sample rate/,
 	'Decrement: dies with negative sample rate',
 );
 
