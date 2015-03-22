@@ -17,11 +17,11 @@ Net::Dogstatsd - Perl client to Datadog's dogstatsd metrics collector.
 
 =head1 VERSION
 
-Version 1.0.2
+Version 1.0.3
 
 =cut
 
-our $VERSION = '1.0.2';
+our $VERSION = '1.0.3';
 
 
 =head1 SYNOPSIS
@@ -31,7 +31,8 @@ via dogstatsd, a local daemon installed by Datadog agent package.
 
 	use Net::Dogstatsd;
 
-	# Create an object to communicate with Dogstatsd, using default server/port settings.
+	# Create an object to communicate with Dogstatsd, using default server and 
+	# port settings.
 	my $dogstatsd = Net::Dogstatsd->new(
 		host    => 'localhost',  #optional. Default = 127.0.0.1
 		port    => '8125',       #optional. Default = 8125
@@ -42,12 +43,12 @@ via dogstatsd, a local daemon installed by Datadog agent package.
 	$dogstatsd->verbose(1);
 	print "In verbose mode." if $dogstatsd->verbose();
 	
-	# Before we can start sending metrics, we have to get or create a socket to dogstatsd
+	# Before sending metrics, we have to get or create a socket to dogstatsd
 	my $socket = $dogstatsd->get_socket();
 	
 	# Counter metrics can be incremented or decremented
-	# By default, they will be incremented or decremented by 1, unless the optional
-	# 'value' parameter is passed
+	# By default, they will be incremented or decremented by 1, unless the 
+	# optional 'value' parameter is passed
 	$dogstatsd->increment(
 		name  => 'test_metric.sample_counter',
 		value => $increment_value, #optional; default = 1
@@ -319,7 +320,8 @@ sub gauge
 
 =head2 histogram()
 
-Send a 'histogram' metric. Provides min/max/avg as well as 75th, 85th, 95th and 99th percentiles.
+Send a 'histogram' metric. Provides min/max/avg as well as 75th, 85th, 95th and 
+99th percentiles.
 NOTE: do not use this for timers. Use timer() instead.
 Include optional arrayref of tags/tag-values.
 
@@ -372,7 +374,8 @@ sub histogram
 
 =head2 timer()
 
-Send a 'timer' metric. Provides min/max/avg as well as 75th, 85th, 95th and 99th percentiles.
+Send a 'timer' metric. Provides min/max/avg as well as 75th, 85th, 95th
+and 99th percentiles.
 Ex: time to run a database query.
 Include optional arrayref of tags/tag-values.
 
@@ -437,7 +440,8 @@ sub timer
 
 =head2 sets()
 
-Send a 'sets' metric. Used to count the number of unique elements in a group. Ex: unique site visitors.
+Send a 'sets' metric. Used to count the number of unique elements in a group. 
+Ex: unique site visitors.
 Include optional arrayref of tags/tag-values.
 
 	$dogstatsd->sets(
@@ -696,7 +700,8 @@ Jennifer Pinkham, C<< <jpinkham at cpan.org> >>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests to the GitHub Issue Tracker at L<https://github.com/jpinkham/net-dogstatsd/issues>.
+Please report any bugs or feature requests to the GitHub Issue Tracker at
+L<https://github.com/jpinkham/net-dogstatsd/issues>.
 I will be notified, and then you'll automatically be notified of progress on
 your bug as I make changes.
 
@@ -738,7 +743,7 @@ Thanks for allowing me to open-source it!
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2013 Jennifer Pinkham.
+Copyright 2015 Jennifer Pinkham.
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License version 3 as published by the Free

@@ -39,6 +39,7 @@ Submit them with the gauge() method.
  * histogram
 
 Histograms measure the statistical distribution of a set of values.
+
 Submit them with the histogram() method.
 
  * timer
@@ -122,7 +123,7 @@ You can also look for information at:
 LICENSE AND COPYRIGHT
 ---------------------
 
-Copyright (C) 2013 Jennifer Pinkham
+Copyright (C) 2015 Jennifer Pinkham
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License version 3 as published by the Free
