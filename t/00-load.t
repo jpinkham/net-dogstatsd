@@ -1,4 +1,4 @@
-#!perl
+#!perl -T
 
 use Test::Most 'bail', tests => 1;
 
