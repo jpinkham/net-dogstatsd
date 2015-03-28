@@ -24,3 +24,6 @@ max_mccabe = 30
 
 # Allow map in void context, now that it's efficient again.
 [-BuiltinFunctions::ProhibitVoidMap]
+
+# I disagree with Conway on this one.
+[-CodeLayout::ProhibitParensWithBuiltins]
