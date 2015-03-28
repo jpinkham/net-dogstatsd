@@ -5,4 +5,5 @@ v1.0.1  2013-12-09
 v1.0.2  2013-12-12
         Updated to be backwards compatible with Perl v5.8.x.
 v1.0.3  2015-03-21
-        Updated 'negative sample rate' tests. Cleaned up documentation.
+        Updated 'negative sample rate' tests. Increased test coverage.
+        Cleaned up documentation.
