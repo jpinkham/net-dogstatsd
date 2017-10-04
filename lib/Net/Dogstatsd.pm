@@ -740,7 +740,7 @@ Thanks for allowing me to open-source it!
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2015 Jennifer Pinkham.
+Copyright 2017 Jennifer Pinkham.
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License version 3 as published by the Free
