@@ -656,6 +656,12 @@ sub _send_metric
 	# metric name/tag
 	$metric_string = lc( $metric_string );
 
+	# Verify metric string is < 8k, per https://github.com/DataDog/datadogpy/blob/master/datadog/dogstatsd/base.py
+	if ( length($metric_string) >= (8 * 1024) )
+	{
+		croak("ERROR - Metric payload is too large (>= 8k)");
+	}
+
 	carp( "\nbuilt metric string >$metric_string<" ) if $verbose;
 
 	# Use of rand() is how the Ruby and Python clients implement sampling, so we will too.
@@ -664,7 +670,7 @@ sub _send_metric
 		my $response = IO::Socket::send( $socket, $metric_string, 0 );
 		unless (defined $response)
 		{
-			carp( "error sending metric [string >$metric_string<]: $!" );
+			carp( "ERROR - failed to send metric [string >$metric_string<]: $!" );
 		}
 	}
 
