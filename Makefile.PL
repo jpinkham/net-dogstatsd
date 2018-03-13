@@ -4,16 +4,16 @@ use ExtUtils::MakeMaker;
 WriteMakefile
 (
   'PREREQ_PM' => {
-                   'Test::FailWarnings' => 0,
+                   'Carp' => 0,
+                   'Data::Dumper' => 0
                    'Data::Validate::Type' => 0,
                    'LWP::UserAgent' => 0,
-                   'Try::Tiny' => 0,
-                   'Scalar::Util' => 0,
-                   'Test::Most' => 0,
                    'Net::Telnet' => 0,
-                   'Carp' => 0,
+                   'Scalar::Util' => 0,
                    'Storable' => 0,
-                   'Data::Dumper' => 0
+                   'Test::Most' => 0,
+                   'Test::FailWarnings' => 0,
+                   'Try::Tiny' => 0,
                  },
   'INSTALLDIRS' => 'site',
   'EXE_FILES' => [],
