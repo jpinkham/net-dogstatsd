@@ -18,6 +18,7 @@ if $@;
 Test::Kwalitee::Extra->import(
 	qw(
 		:optional
+		:experimental
 	)
 );
 
