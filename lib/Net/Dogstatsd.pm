@@ -557,6 +557,33 @@ sub _error_checks
 		croak( 'ERROR - Invalid metric name >' . $args{'name'} . '<. Names must start with a letter, a-z. Not sending.' );
 	}
 
+	$self->_tag_error_checks(%args);
+
+	# Check that optional 'sample_rate' argument is valid ( 1, or a float between 0 and 1 )
+	if ( defined $args{'sample_rate'} )
+	{
+		if ( !Data::Validate::Type::is_number( $args{'sample_rate'} , strictly_positive => 1 ) || $args{'sample_rate'} > 1 )
+		{
+			croak 'ERROR - Invalid sample rate >' . $args{'sample_rate'} . '<. Must be 1, or a float between 0 and 1.';
+		}
+	}
+
+	return;
+}
+
+=head2 _tag_error_checks()
+
+	$self->_tag_error_checks( %args );
+
+Error checking for tags.
+
+=cut
+
+sub _tag_error_checks
+{
+	my ( $self, %args ) = @_;
+	my $verbose = $self->verbose();
+
 	# Tags, if exist...
 	if ( defined( $args{'tags'} ) && scalar( @{ $args{'tags'} } ) != 0 )
 	{
@@ -582,18 +609,30 @@ sub _error_checks
 		}
 	}
 
-	# Check that optional 'sample_rate' argument is valid ( 1, or a float between 0 and 1 )
-	if ( defined $args{'sample_rate'} )
-	{
-		if ( !Data::Validate::Type::is_number( $args{'sample_rate'} , strictly_positive => 1 ) || $args{'sample_rate'} > 1 )
-		{
-			croak 'ERROR - Invalid sample rate >' . $args{'sample_rate'} . '<. Must be 1, or a float between 0 and 1.';
-		}
-	}
-
 	return;
 }
 
+=head2 _tag_string()
+
+Get string for tags.
+=cut
+
+sub _tag_string {
+	my ( $self, $tags ) = @_;
+
+	foreach my $tag ( @$tags )
+	{
+		my $original_tag = $tag;
+
+		$tag =~ s/\s+$//; # Strip trailing whitespace
+		# Tags should only contain alphanumeric, "_", "-",".", "/", ":". Convert anything else to underscore and warn about substitution
+		$tag =~ s/[^a-zA-Z0-9_\-\.\/:]/_/g;
+		$tag =~ s/\s+/_/g; # Replace remaining whitespace with underscore
+		carp( "WARNING: converted tag from >$original_tag< to >$tag<. Tags should only contain: a-z, 0-9, underscores, dashes, dots/periods, forward slashes, colons." )
+			if $tag ne $original_tag;
+	}
+	return '|#' . join( ',', @$tags );
+}
 
 =head2 _send_metric()
 
@@ -637,18 +676,7 @@ sub _send_metric
 
 	if ( defined $args{'tags'} && scalar ( @{ $args{'tags'} } ) != 0 )
 	{
-		foreach my $tag ( @{ $args{'tags'} } )
-		{
-			my $original_tag = $tag;
-
-			$tag =~ s/\s+$//; # Strip trailing whitespace
-			# Tags should only contain alphanumeric, "_", "-",".", "/", ":". Convert anything else to underscore and warn about substitution
-			$tag =~ s/[^a-zA-Z0-9_\-\.\/:]/_/g;
-			$tag =~ s/\s+/_/g; # Replace remaining whitespace with underscore
-			carp( "WARNING: converted tag from >$original_tag< to >$tag<. Tags should only contain: a-z, 0-9, underscores, dashes, dots/periods, forward slashes, colons." )
-				if $tag ne $original_tag;
-		}
-		$metric_string .= '|#' . join( ',', @{ $args{'tags'} } );
+		$metric_string .= $self->_tag_string($args{'tags'});
 	}
 
 	# Force to all lower case because Datadog has case sensitive tags and metric
@@ -739,8 +767,7 @@ I originally developed this project for ThinkGeek (L<http://www.thinkgeek.com/>)
 Thanks for allowing me to open-source it!
 
 =head1 COPYRIGHT & LICENSE
-
-Copyright 2017 Jennifer Pinkham.
+Copyright 2018 Jennifer Pinkham.
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License version 3 as published by the Free
