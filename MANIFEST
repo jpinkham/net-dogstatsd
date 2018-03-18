@@ -32,6 +32,4 @@ xt/module_versions.t
 xt/perlcritic.t
 xt/pod-coverage.t
 xt/pod.t
-xt/prereq.t
 xt/unix_eol.t
-Makefile.PL
