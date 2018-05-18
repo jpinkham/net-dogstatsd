@@ -17,7 +17,7 @@ Net::Dogstatsd - Perl client to Datadog's dogstatsd metrics collector.
 
 =head1 VERSION
 
-Version 1.0.3
+Version 1.0.4
 
 =cut
 
@@ -198,14 +198,18 @@ sub get_socket
 				PeerAddr => $self->{'host'},
 				PeerPort => $self->{'port'},
 				Proto    => 'udp'
-				)
-			|| die 'Could not open UDP connection to' . $self->{'host'} . ':' . $self->{'port'} . "\n";
-
+			) or die 
+				'Could not open UDP connection to ' 
+				. $self->{'host'} . ':' . $self->{'port'} 
+				. " - $@";
 		}
 		catch
 		{
 			#TODO how to reach this to test it?
-			croak( "Could not open connection to metrics server. Error: >$_<" );
+			# To get here it is possible to provide not resolvable domain or address.
+			# This can happen if application using this module is restarted while DNS
+			# is down or routing is being reconfigured.
+			carp "Could not open connection to metrics server. Error: >$_<";
 		};
 	}
 
