@@ -21,7 +21,7 @@ Version 1.0.4
 
 =cut
 
-our $VERSION = '1.0.3';
+our $VERSION = '1.0.4';
 
 
 =head1 SYNOPSIS
@@ -198,9 +198,9 @@ sub get_socket
 				PeerAddr => $self->{'host'},
 				PeerPort => $self->{'port'},
 				Proto    => 'udp'
-			) or die 
-				'Could not open UDP connection to ' 
-				. $self->{'host'} . ':' . $self->{'port'} 
+			) or die
+				'Could not open UDP connection to '
+				. $self->{'host'} . ':' . $self->{'port'}
 				. " - $@";
 		}
 		catch
