@@ -4,7 +4,7 @@ WriteMakefile
 (
   'PREREQ_PM' => {
                    'Carp' => 0,
-                   'Data::Dumper' => 0
+                   'Data::Dumper' => 0,
                    'Data::Validate::Type' => 0,
                    'LWP::UserAgent' => 0,
                    'Net::Telnet' => 0,
