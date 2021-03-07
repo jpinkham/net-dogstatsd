@@ -1,3 +1,5 @@
+# THIS IS NO LONGER MAINTAINED
+
 Net-Dogstatsd
 =============
 
